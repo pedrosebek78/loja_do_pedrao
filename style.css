@@ -1,0 +1,183 @@
+body {
+    margin: 0;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+}
+
+.card {
+    margin: 1em;
+}
+
+header {
+    display: flex;
+    flex-direction: row;
+    background-color: darkblue;
+    padding: 2em;
+}
+
+
+
+header .parte {
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    align-items: flex-start;
+    /* margin-right: 1em; */
+    /* width: fit-content; */
+    /* gap: 10px; */
+}
+
+header .elementoHeader {
+    display: inline-flex;
+    flex-direction: column;
+    width: fit-content;
+
+    /* height: fit-content; */
+    /* justify-content: left; */
+    /* height: 100%; */
+
+}
+
+header .parte .elementoHeader .modeTitle {
+    flex-direction: column;
+    background-color: black;
+    text-align: center;
+    color: white;
+    width: 100%;
+}
+
+header .parte .elementoHeader .modeBtns {
+    display: flex;
+    flex-direction: row;
+    /* gap: 0; */
+    width: 100%
+}
+
+header .parte .elementoHeader .modeBtns button {
+    background-color: black;
+    flex: 1;
+    margin: 0;
+    border-radius: 0 0 0 0;
+    /* margin-left: none;
+    margin-right: none; */
+}
+
+header .manas {
+    display: flex;
+    flex-direction: row;
+    width: 15em;
+}
+
+header .manas img {
+    width: 2em;
+    margin: 4px;
+}
+
+header .parte .elementoHeader .manas button {
+    background: none;
+    width: min-content;
+    height: min-content;
+    margin-right: 0;
+}
+
+header .parte .elementoHeader .manas button:hover {
+    opacity: 0.7;
+}
+
+header .parte .divForm button {
+    height: 100%;
+}
+
+header .status {
+    justify-content: center;
+    background-color: white;
+    border-radius: 1em;
+}
+
+
+
+header .elementoHeader input {
+    width: auto;
+    height: auto;
+    padding: 0.7em;
+    border: none;
+    outline: none;
+    border-radius: 0.7em 0 0 0.7em;
+
+
+}
+
+header .elementoHeader button {
+    background-color: black;
+    height: auto;
+    padding: 0.7em;
+    color: white;
+    border: none;
+    outline: none;
+    border-radius: 0 0.7em 0.7em 0;
+    cursor: pointer;
+    margin-right: 5em;
+    
+}
+
+
+
+header .parte button:hover {
+    opacity: 0.93;
+}
+
+.parte .form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form input {
+    width: 25em;
+    padding: 0.7em;
+    border: none;
+    outline: none;
+}
+
+.isPressed {
+    opacity: 0.5;
+}
+
+.tooltip {
+  position: fixed;
+  background: #111;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 9999;
+}
+
+.cardBtn {
+    background-color: black;
+    color: white;
+    border: none;
+    padding: 0.5em;
+}
+
+.card button:hover {
+    opacity: 0.8;
+}
+
+
+.cardsRow {
+    display: flex;
+    flex-direction: row;
+    width: fit-content;
+}
+
+.nameP {
+    max-width: 154px;
+    color: green;
+    
+}

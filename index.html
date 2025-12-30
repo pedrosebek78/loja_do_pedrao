@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Loja do Pedrão</title>
+</head>
+
+<body>
+    <header>
+        <div class="parte">
+            <div class="elementoHeader">
+                <input type="text" id="searchInput" placeholder="Pesquisar">
+                <div class="manas">
+                    <button id="w"><img src="img/w.jpg" alt="White Mana Button"></button>
+                    <button id="u"><img src="img/u.jpg" alt="Blue Mana Button"></button>
+                    <button id="b"><img src="img/b.jpg" alt="Black Mana Button"></button>
+                    <button id="r"><img src="img/r.jpg" alt="Red Mana Button"></button>
+                    <button id="g"><img src="img/g.jpg" alt="Green Mana Button"></button>
+                </div>
+            </div>
+            <div class="elementoHeader">
+                <button id="searchBtn">Pesquisar</button>
+            </div>
+        </div>
+        <div class="parte">
+            <div class="elementoHeader">
+                <div class="modeTitle">
+                    <h2>Mode</h2>
+                </div>
+                <div class="modeBtns">
+                    <button id="mode1">CARD SEARCH</button>
+                    <button id="mode2">FAVORITE</button>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="parte">
+            <div class="elementoHeader">
+                <input type="text" id="name" placeholder="Name">
+                <input type="text" id="color" placeholder="Color">
+                <input type="number" id="price" placeholder="Price">
+                <input type="text" id="imgurl" placeholder="Image Url">
+            </div>
+            <div class="elementoHeader divForm">
+                <button id="submitBtn">Add Card</button>
+                <button id="delBtn">Delete Card</button>
+            </div>
+        </div> -->
+        <div class="parte status">
+            <p id="status"></p>
+        </div>
+
+    </header>
+
+    <div class="container"></div>
+
+    <footer></footer>
+
+    <script>
+        const searchInput = document.getElementById("searchInput");
+        const searchBtn = document.getElementById("searchBtn");
+        const cardNameInput = document.getElementById("name");
+        const cardColorInput = document.getElementById("color");
+        const cardPriceInput = document.getElementById("price");
+        const cardImgInput = document.getElementById("imgurl");
+        const submitBtn = document.getElementById("submitBtn");
+        const delBtn = document.getElementById("delBtn");
+        const statusP = document.getElementById("status");
+        const manaBtns = [document.getElementById("w"), document.getElementById("u"), document.getElementById("b"), document.getElementById("r"), document.getElementById("g")]
+        const manaStates = Array(manaBtns.length).fill(false)
+        const modeBtns = Array(document.getElementById("mode1"), document.getElementById("mode2"))
+        const container = document.querySelector(".container")
+        const cardsRow = document.createElement("div")
+        const divs = document.createElement("div")
+        divs.classList.add("cardsRow")
+        cardsRow.classList.add("cardsRow")
+
+        let modeState = false;
+        let isM1Pressed = true;
+        let isM2Pressed = false;
+        function difValues(x) {
+            for (let i = 1; i < x.length; i++) {
+                if (x[i] !== x[0]) {
+                    return true;       
+                }
+            }
+            return false;
+        }
+
+        modeBtns[1].classList.add("isPressed");
+
+        for (i = 0; i < manaBtns.length; i++) {
+            let button = manaBtns[i];
+            let isPressed = false;
+            let position = i;
+
+            button.addEventListener("click", () => {
+                isPressed = !isPressed;
+                button.classList.toggle("isPressed", isPressed)
+                manaStates[position] = !manaStates[position];
+                console.log(position, manaStates)
+            })
+        }
+
+        modeBtns[0].addEventListener("click", () => {
+            if (isM1Pressed ==true) {
+                return;
+            } else {
+                isM1Pressed = !isM1Pressed;
+                isM2Pressed = !isM1Pressed;
+                modeState = isM2Pressed;
+                container.innerHTML=""
+                statusP.innerHTML=""
+                modeBtns[0].classList.toggle("isPressed", !isM1Pressed)
+                modeBtns[1].classList.toggle("isPressed", isM1Pressed)                
+                console.log(modeState, window.innerWidth)                
+            }
+        })
+
+        modeBtns[1].addEventListener("click", async () => {
+            if(isM2Pressed ==true) {
+                return;
+            } else {
+                isM2Pressed = !isM2Pressed;
+                isM1Pressed = !isM2Pressed;
+                modeState = isM2Pressed;
+                container.innerHTML=""
+                statusP.innerHTML="";
+                cardsRow.innerHTML=""
+                divs.innerHTML=""
+                modeBtns[1].classList.toggle("isPressed", !isM2Pressed)
+                modeBtns[0].classList.toggle("isPressed", isM2Pressed)
+                
+                const response = await fetch("http://localhost:3000/fetchAll", {
+                    method : "POST",
+                    headers : {"Content-Type" : "application/json"},
+                    body : JSON.stringify({
+                        enviarTudo : "sim"
+                    })                    
+                })
+
+                const data = await response.json()
+
+                console.log("AREA WINDOW DESAFROUXADA", window.innerWidth)
+
+                function createRow () {
+                    const row = window.document.createElement("div")
+                    row.classList.add("cardsRow")
+                    container.appendChild(row)
+                    return row;
+                }
+
+                let cardsRow = createRow();
+
+                function adicionarCard(cardDiv) {
+                    
+                }
+
+
+
+                data.results.forEach(card => {
+                    const cardDiv = document.createElement("div");                                
+                    cardDiv.classList.add("card");
+
+                        let img = document.createElement("img")
+                        img.src = card.image
+                        img.height = 200
+                        img.width = 150
+
+                        let ttimg = document.createElement("img")
+                        ttimg.src = card.image
+                        ttimg.height = 400
+                        ttimg.width = 300
+
+                        let tooltip = document.createElement("div")
+                        tooltip.classList.add("tooltip")
+                        tooltip.appendChild(ttimg)
+
+                        img.addEventListener("mouseenter", () => {
+                            tooltip.style.opacity = 1;
+                        })
+
+                        img.addEventListener("mousemove", (e) => {
+                            const rect = tooltip.getBoundingClientRect();                                    
+                            let x = e.clientX + 12;
+                            let y = e.clientY - 60;
+                            console.log(x, rect.width, window.innerWidth)
+                            // console.log(y, rect.height, window.innerHeight)
+
+                            if (x + rect.width > window.innerWidth) {
+                                x = x - rect.width - 12
+                            }
+
+                            if (y + rect.height > window.innerHeight) {
+                                y = window.innerHeight - rect.height
+                            }
+
+                            tooltip.style.left = x + "px";
+                            tooltip.style.top = y + "px";
+                        })
+
+                        img.addEventListener("mouseleave", () => {
+                            tooltip.style.opacity = 0
+                        })
+                    
+                        container.appendChild(tooltip)
+            
+                        const name = document.createElement("p");
+                        name.classList.add("nameP")
+                        name.textContent = card.cardname;
+
+                        // preço
+                        const price = document.createElement("p");
+                        price.textContent = `R$${card.price}`;
+
+                        
+                        const editBtn = document.createElement("button");
+                        editBtn.textContent = "Editar Preço";
+                        editBtn.classList.add("cardBtn")
+                        let isPressed = false;
+                        let priceInput;
+                        let subEdBtn;
+                        
+                        editBtn.addEventListener("click", () => {
+                            switch (isPressed) {
+                                case false:
+                                    isPressed = !isPressed
+                                    console.log(isPressed)                                                                            
+                                    priceInput = document.createElement("input")
+                                    priceInput.setAttribute("type", "number")
+                                    priceInput.setAttribute("placeholder", "Digite o novo preço:")
+                                    cardDiv.appendChild(priceInput)
+
+                                    subEdBtn = document.createElement("button")
+                                    subEdBtn.classList.add("cardBtn")
+                                    subEdBtn.textContent = "Enviar"
+                                    cardDiv.appendChild(subEdBtn)
+                                    subEdBtn.addEventListener("click", async () => {
+                                        const response = await fetch(`http://localhost:3000/editPrice`, {
+                                            method: "POST",
+                                            headers: {"Content-Type" : "application/json"},
+                                            body: JSON.stringify({
+                                                newPrice : priceInput.value,
+                                                cardName : card.cardname
+                                            })
+                                        })
+                                        
+                                        const data = await response.json()
+                                        console.log("Data",data, data.results.affectedRows)
+                                        
+                                        if (data.results.affectedRows > 0) {
+                                            statusP.innerHTML="Preço editado com sucesso!"
+                                            price.textContent = `R$${priceInput.value}`;
+                                        } else {
+                                            statusP.innerHTML="Algo deu errado"
+                                        }
+
+                                        priceInput.remove()
+                                        subEdBtn.remove()
+                                        isPressed = !isPressed
+                                    })
+                                    
+                                    break;
+
+                                case true: 
+                                    isPressed = !isPressed;                                            
+                                    console.log(isPressed) 
+                                    priceInput.remove();
+                                    subEdBtn.remove();
+                                    break;                                       
+                            }                                   
+                        })
+
+                        const delBtn = document.createElement("button")
+                        delBtn.classList.add("cardBtn")
+                        delBtn.textContent = "Remover"
+                        delBtn.addEventListener("click", async () => {
+                            const response = await fetch("http://localhost:3000/delete", {
+                                method : "POST",
+                                headers : {"Content-Type" : "application/json"},
+                                body : JSON.stringify({
+                                    cardname : card.cardname
+                                })
+                            })
+
+                            const data = await response.json()
+                            if (data.affectedRows > 0) {
+                                statusP.innerHTML="Card removido!"
+                                cardDiv.remove()
+                            } else {
+                                statusP.innerHTML = "Algo deu errado"
+                            }
+                        })
+
+
+                        // adiciona ao card
+                        cardDiv.appendChild(img);
+                        cardDiv.appendChild(name);
+                        cardDiv.appendChild(price);
+                        cardDiv.appendChild(editBtn);
+                        cardDiv.appendChild(delBtn)
+                        cardsRow.appendChild(cardDiv)
+                        container.appendChild(cardsRow)
+                        
+                        if (cardsRow.getBoundingClientRect().width >= window.innerWidth) {
+                            console.log("muitas cartas")
+                            divs.appendChild(cardDiv)
+                            container.appendChild(divs)
+                            divs.addEventListener("")
+                        }
+                        console.log("\n\n ROW: \n\n", cardsRow.getBoundingClientRect(),"\n\n WINDOW.INNERWIDTH \n\n", window.innerWidth, "\n\n WINDOW.OUTERWIDTH\n\n", window.outerWidth, "\n\n AREA CARD \n\n")
+
+                    });
+                console.log("CARDSROW GBCR",cardsRow.getBoundingClientRect())
+            }
+        })
+        
+        window.addEventListener("resize",c => {
+            console.log(c)
+        })
+        
+        searchBtn.addEventListener("click", () => {
+
+            if (manaStates.every(q => q ===true) && manaStates.length == 5) {
+                manaStates.push(true)
+            } else {
+                if (difValues(manaStates) && manaStates.length == 6) {
+                    manaStates.pop()
+                }
+            }
+
+            switch (modeState) {
+                case true:
+                    fetch("http://localhost:3000/search", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ cardname: searchInput.value, manaValues: manaStates})
+                    })
+                        .then(res => {
+                            console.log("Baú", res);
+                            return res.json();
+                        })
+                        .then(data => {
+                            console.log(data)
+                        })
+                        // .then(data => {
+                        //     console.log("JOIAS", data)
+                        //     const cardsNum = JSON.stringify(data.length);                            
+                        //     container.innerHTML = ""; // limpa resultados anteriores
+                        //     cardsRow.innerHTML = ""
+                        //     if (data.length === 0) {
+                        //         statusP.innerHTML = "Carta não encontrada!";
+                        //         return;
+                        //     }
+                        //     statusP.innerHTML = `Carta(s) Encontradas: ${cardsNum}`;
+                            
+                        //     data.forEach(card => {
+                        //         const cardDiv = document.createElement("div");                                
+                        //         cardDiv.classList.add("card");
+        
+                        //         let img = document.createElement("img")
+                        //         img.src = card.image
+                        //         img.height = 200
+                        //         img.width = 150
+
+                        //         let ttimg = document.createElement("img")
+                        //         ttimg.src = card.image
+                        //         ttimg.height = 400
+                        //         ttimg.width = 300
+
+                        //         let tooltip = document.createElement("div")
+                        //         tooltip.classList.add("tooltip")
+                        //         tooltip.appendChild(ttimg)
+
+                        //         img.addEventListener("mouseenter", () => {
+                        //             tooltip.style.opacity = 1;
+                        //         })
+
+                        //         img.addEventListener("mousemove", (e) => {
+                        //             const rect = tooltip.getBoundingClientRect();                                    
+                        //             let x = e.clientX + 12;
+                        //             let y = e.clientY - 60;
+                        //             console.log(x, rect.width, window.innerWidth)
+                        //             // console.log(y, rect.height, window.innerHeight)
+
+                        //             if (x + rect.width > window.innerWidth) {
+                        //                 x = x - rect.width - 12
+                        //             }
+
+                        //             if (y + rect.height > window.innerHeight) {
+                        //                 y = window.innerHeight - rect.height
+                        //             }
+
+                        //             tooltip.style.left = x + "px";
+                        //             tooltip.style.top = y + "px";
+                        //         })
+
+                        //         img.addEventListener("mouseleave", () => {
+                        //             tooltip.style.opacity = 0
+                        //         })
+                            
+                        //         container.appendChild(tooltip)
+                    
+                        //         const name = document.createElement("p");
+                        //         name.classList.add("nameP")
+                        //         name.textContent = card.cardname;
+        
+                        //         // preço
+                        //         const price = document.createElement("p");
+                        //         price.textContent = `R$${card.price}`;
+
+                                
+                        //         const editBtn = document.createElement("button");
+                        //         editBtn.textContent = "Editar Preço";
+                        //         editBtn.classList.add("cardBtn")
+                        //         let isPressed = false;
+                        //         let priceInput;
+                        //         let subEdBtn;
+                                
+                        //         editBtn.addEventListener("click", () => {
+                        //             switch (isPressed) {
+                        //                 case false:
+                        //                     isPressed = !isPressed
+                        //                     console.log(isPressed)                                                                            
+                        //                     priceInput = document.createElement("input")
+                        //                     priceInput.setAttribute("type", "number")
+                        //                     priceInput.setAttribute("placeholder", "Digite o novo preço:")
+                        //                     cardDiv.appendChild(priceInput)
+        
+                        //                     subEdBtn = document.createElement("button")
+                        //                     subEdBtn.textContent = "Enviar"
+                        //                     subEdBtn.classList.add("cardBtn")
+                        //                     cardDiv.appendChild(subEdBtn)
+                        //                     subEdBtn.addEventListener("click", async () => {
+                        //                         const response = await fetch(`http://localhost:3000/editPrice`, {
+                        //                             method: "POST",
+                        //                             headers: {"Content-Type" : "application/json"},
+                        //                             body: JSON.stringify({
+                        //                                 newPrice : priceInput.value,
+                        //                                 cardName : card.cardname
+                        //                             })
+                        //                         })
+                                                
+                        //                         const data = await response.json()
+                        //                         console.log("Data",data, data.results.affectedRows)
+                                                
+                        //                         if (data.results.affectedRows > 0) {
+                        //                             statusP.innerHTML="Preço editado com sucesso!"
+                        //                             price.textContent = `R$${priceInput.value}`;
+                        //                         } else {
+                        //                             statusP.innerHTML="Algo deu errado"
+                        //                         }
+
+                        //                         priceInput.remove()
+                        //                         subEdBtn.remove()
+                        //                         isPressed = !isPressed
+                        //                     })
+                                         
+                        //                     break;
+
+                        //                 case true: 
+                        //                     isPressed = !isPressed;                                            
+                        //                     console.log(isPressed) 
+                        //                     priceInput.remove();
+                        //                     subEdBtn.remove();
+                        //                     break;                                       
+                        //             }                                   
+                        //         })
+
+                        //         const delBtn = document.createElement("button")
+                        //         delBtn.classList.add("cardBtn")
+                        //         delBtn.textContent = "Remover"
+                        //         delBtn.addEventListener("click", async () => {
+                        //             const response = await fetch("http://localhost:3000/delete", {
+                        //                 method : "POST",
+                        //                 headers : {"Content-Type" : "application/json"},
+                        //                 body : JSON.stringify({
+                        //                     cardname : card.cardname
+                        //                 })
+                        //             })
+
+                        //             const data = await response.json()
+                        //             if (data.affectedRows > 0) {
+                        //                 statusP.innerHTML="Card removido!"
+                        //                 cardDiv.remove()
+                        //             } else {
+                        //                 statusP.innerHTML = "Algo deu errado"
+                        //             }
+                        //         })
+
+
+                        //         // adiciona ao card
+                        //         cardDiv.appendChild(img);
+                        //         cardDiv.appendChild(name);
+                        //         cardDiv.appendChild(price);
+                        //         cardDiv.appendChild(editBtn);
+                        //         cardDiv.appendChild(delBtn)
+                                
+                        //         // adiciona card ao container    
+                        //         cardsRow.appendChild(cardDiv);                            
+                        //         container.appendChild(cardsRow)           
+                        //         console.log(cardsRow.getBoundingClientRect().width, window.innerWidth)                                                  
+                        //     });
+                        // })
+                        .catch(err => console.error("Erro:", err));
+                    break;
+
+                case false:
+                    // console.log(searchInput.value)
+                    let manasi = Array("W", "U", "B", "R", "G")
+                    let iq = Array()
+
+                    for (let i = 0; i < manaStates.length; i++) {
+                        if (manaStates[i]) {
+                            iq.push(i)
+                        }
+                    }
+
+                    manasi = manasi.filter((_, index) => !iq.includes(index));
+
+                    console.log("Filtros retirados: ",iq, "\n\n Filtros utilizados: ", manasi)
+
+                    fetch("http://localhost:3000/deepSearch", 
+                    {
+                        method: "POST",
+                        headers: {"Content-Type" : "application/json"},
+                        body: JSON.stringify(
+                            {
+                                cardname : searchInput.value,
+                                filter : manasi
+                            }
+                        )
+                    })
+                    .then(res => {
+                        return res.json()
+                    })
+                    .then(data => {
+                        console.log("Data", data)                          
+                        switch (data.deuRuim) {
+                            case false:
+                                container.innerHTML = ""
+                                cardsRow.innerHTML = ""
+                                
+                                for (let i = 0; i < data.saviour.length; i++) {
+                                    const manaArr = data.saviour[i].colors
+                                    const manaString = manaArr.join()
+
+                                    const cardDiv = document.createElement("div")
+                                    cardDiv.classList.add("card")
+                                    
+                                    const img = document.createElement("img")
+                                    img.src = data.saviour[i].imageUrl
+                                    img.height = 200;
+                                    img.width = 150;
+                                    
+                                   
+
+                                    img.addEventListener("mouseenter", () => {
+                                        tooltip.style.opacity = 1
+                                    })
+
+                                    img.addEventListener("mousemove", e => {
+                                        const rect = tooltip.getBoundingClientRect();
+                                        let x = e.clientX + 12;
+                                        let y = e.clientY - 60;
+
+                                        console.log(y, rect.height, window.innerHeight)
+                                        if (x + rect.width > window.innerWidth) {
+                                            x = x - rect.width - 12
+                                        }
+
+                                        if (y + rect.height > window.innerHeight) {
+                                            y = window.innerHeight - rect.height
+                                        }
+
+                                        tooltip.style.left = x + "px";
+                                        tooltip.style.top = y + "px";
+                                    })
+
+
+                                    img.addEventListener("mouseleave", () => {
+                                        tooltip.style.opacity = 0
+                                    })
+
+                                    const ttimg = document.createElement("img")
+                                    ttimg.src = img.src                    
+                                    ttimg.height = 400;
+                                    ttimg.width = 300;
+
+                                    const tooltip = document.createElement("div")
+                                    tooltip.classList.add("tooltip")
+                                    tooltip.appendChild(ttimg)
+
+                                    container.appendChild(tooltip)
+
+                                    const name = document.createElement("p")
+                                    name.classList.add("nameP")
+                                    name.textContent = data.saviour[i].name
+
+                                    const favBtn = document.createElement("button")
+                                    let isPressed = false
+                                    favBtn.textContent = "Favoritar"
+                                    favBtn.classList.add("cardBtn")
+                                    let inputValue;
+                                    let subBtn;
+
+                                    
+
+                                    favBtn.addEventListener("click", () => {
+                                        isPressed = !isPressed
+                                        console.log(isPressed)
+                                        switch (isPressed) {
+                                            case true:
+                                                inputValue = document.createElement("input")
+                                                inputValue.setAttribute("type", "number")
+                                                inputValue.setAttribute("placeholder", "Digite o valor do card:")
+                                                cardDiv.appendChild(inputValue)
+
+                                                subBtn = document.createElement("button")
+                                                subBtn.textContent = "Enviar"
+                                                subBtn.classList.add("cardBtn")
+                                                cardDiv.appendChild(subBtn)
+                                                subBtn.addEventListener("click", async () => {
+                                                    const response = await fetch("http://localhost:3000/submit", {
+                                                        method : "POST",
+                                                        headers : {"Content-Type" : "application/json"},
+                                                        body : JSON.stringify({
+                                                            cn : name.textContent,
+                                                            cc : manaString,
+                                                            cp : inputValue.value,
+                                                            ci : img.src
+                                                        })
+                                                    });
+                                                    const data = await response.json()
+                                                    
+                                                    if (data.affectedRows > 0) {
+                                                        statusP.innerHTML = "Card Favoritado!"                                                        
+                                                        favBtn.remove()                     
+                                                    } else {
+                                                        statusP.innerHTML = "Algo deu errado"
+                                                    }                    
+                                                    inputValue.remove()
+                                                    subBtn.remove()           
+                                                })
+                                                break;
+
+                                            case false:                                                
+                                                inputValue.remove()
+                                                subBtn.remove()
+                                        }
+                                    })
+
+                                    
+                                    cardDiv.appendChild(img)
+                                    cardDiv.appendChild(name)
+                                    cardDiv.appendChild(favBtn)
+                                    cardsRow.appendChild(cardDiv)
+                                    container.appendChild(cardsRow)                                  
+                              }
+
+                                break;
+                        }
+
+                    })
+                }})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    // fetch("http://localhost:3000/deepSearch", {
+                    //     method: "POST",
+                    //     headers: {"Content-Type" : "application/json"},
+                    //     body: JSON.stringify({
+                    //         cardname : searchInput.value
+                    //     })
+                    // })
+                    // .then(res => {
+                    //     console.log("RESPONSE: ",res)
+                    //     return res.json()
+                    // })
+                    // .then(data => {
+                    //     console.log(data.name)
+                    //     const container = document.querySelector(".container");
+                    //     container.innerHTML = "";
+                        
+                    //     const cardDiv = document.createElement("div")
+                    //     cardDiv.classList.add("card")
+
+
+                    //     const img = document.createElement("img")
+                    //     img.src = data.imageUrl;
+                    //     img.alt = data.name;
+                    //     img.height = 200;
+                    //     img.width = 150;
+
+                    //     const name = document.createElement("p")
+                    //     name.textContent = img.alt
+
+                    //     cardDiv.appendChild(img)
+                    //     cardDiv.appendChild(name)
+                    //     container.appendChild(cardDiv)
+
+
+
+
+                        
+                        
+                        // console.log(JSON.stringify(data).length)
+                        // const cardsNum = JSON.stringify(data);
+
+
+                    // })
+
+           
+
+        // submitBtn.addEventListener("click", () => {
+        //     console.log(cardNameInput.value, cardColorInput.value, cardPriceInput.value, cardImgInput.value )
+
+        //     if (!cardNameInput.value || !cardColorInput.value || !cardPriceInput || !cardImgInput.value) {
+        //         statusP.innerHTML="Preencha todos os campos"
+        //     } else {
+        //         fetch("http://localhost:3000/submit", 
+        //         {
+        //             method : "POST",
+        //             headers : {"Content-Type" : "application/json"},
+        //             body : JSON.stringify(
+        //                 {
+        //                     cn : cardNameInput.value,
+        //                     cc : cardColorInput.value,
+        //                     cp : cardPriceInput.value,
+        //                     ci : cardImgInput.value
+        //                 }
+        //             )
+        //         })
+        //         .then(res => {
+        //             return res.json()
+        //         })
+        //         .then(data => {
+        //             if (data.affectedRows > 0) {
+        //                 statusP.innerHTML="Card adicionado!"
+        //             } else {
+        //                 statusP.innerHTML="Card já existe no banco"
+        //             }
+        //         })
+        //     }
+
+        // })
+        
+        // delBtn.addEventListener("click", () => {
+        //     const value = cardNameInput.value;
+            
+        //     fetch("http://localhost:3000/delete",
+        //     {
+        //         method: "POST",
+        //             headers: { "Content-Type": "application/json" },
+        //             body: JSON.stringify(
+        //                 {
+        //                     cardname: value
+        //                 }
+        //             )
+        //     })
+        //     .then (res => {
+        //         return res.json()
+
+                // if (res.status == 200) {
+                //     statusP.innerHTML="Card deletado com sucesso!"
+                // } else {
+                //     statusP.innerHTML="Esse card não existe"
+                // }
+        //     })
+        //     .then (data => {
+        //         console.log("TREASURE: ", data)
+        //         if(data.affectedRows == 0) {
+        //             statusP.innerHTML = "Deu ruim sae truta"
+        //         } else {
+        //             statusP.innerHTML = "Deu baozin sô"
+        //         }
+        //     })
+        // })
+        
+                // for(i = 0; i < manaBtns.length; i++) {
+                //     let manaBtn = manaBtns[i];
+                //     let isPressed = false;
+                //     manaBtn.addEventListener("click", () => {
+                //         isPressed = !isPressed;
+                //         manaBtn.classList.toggle("isPressed", isPressed)
+                //         console.log(isPressed)
+                //     })
+                // }
+        
+                // manaBtns.forEach(button => {
+                //     let isPressed = false;
+                //     button.addEventListener("click", () => {
+                //         isPressed = !isPressed;
+                //         button.classList.toggle("isPressed", isPressed);
+                //     })
+                // })
+        </script>
+
+</body>
+
+</html>
