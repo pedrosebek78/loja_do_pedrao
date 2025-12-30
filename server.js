@@ -7,9 +7,9 @@ const mysql = require("mysql2");
 /* UTILIZAÇÃO DA FUNÇÃO createConnection do objeto mysql para estabelecer uma conexão com o banco*/
 
 const db = mysql.createPool({
-    host: "localhost",
+    host: "127.0.0.1",
     user: "root",
-    password: "Pedro!3007",
+    password: "3007",
     database: "tcg",
     waitForConnections: true,
     connectionLimit: 10,
@@ -116,21 +116,32 @@ const server = http.createServer((req, res) => {
                     return;
                 } else {
                     console.log("\n\n RESPONSE FETCH : \n\n", response, "\n\n BODY DA RESPONSE: ", data, "\n\n CARTA INGLÊS: ", data.cards[0])
-                    for (i = 0; i < 5; i++) {
+                    for (i = 0; i < JSON.stringify(data.cards.length); i++) {
+
                         const { name, colors, imageUrl } = data.cards[i]
                         cardsArr.push({
-                            name : name,
-                            colors : colors,
-                            imageUrl : imageUrl
+                            name: name,
+                            colors: colors,
+                            imageUrl: imageUrl
                         })
                     }
-                    console.log("\n\n ARRAY DAS CARTAS:\n\n",cardsArr)
+
+                    cardsArr = cardsArr.filter(card => card.imageUrl)
+                    cardsArr = cardsArr.filter(card => card.imageUrl != "https://gatherer.wizards.com/assets/card_back.webp")
+                    // cardsArr = cardsArr.filter(card => card.imageUrl != undefined)
+                    cardsArr = cardsArr.filter(
+                        (card, index, arr) =>
+                            arr.findIndex(c => c.name === card.name) === index
+                    );
+
+                    console.log("\n\n ARRAY DAS CARTAS:\n\n", cardsArr)
                     return cardsArr;
 
                 }
             }
 
-            const saviour = await fe(cardname, filterString)
+            const saviour = await fe(cardname, filterString);
+            console.log(saviour)
             if (!saviour) {
                 res.writeHead(500, { "Content-Type": "application/json" })
                 res.end(JSON.stringify({ deuRuim: true }))
@@ -138,7 +149,7 @@ const server = http.createServer((req, res) => {
                 res.writeHead(200, { "Content-Type": "application/json" })
                 res.end(JSON.stringify({
                     saviour,
-                    deuRuim : false
+                    deuRuim: false
                 }))
             }
 
@@ -231,13 +242,13 @@ const server = http.createServer((req, res) => {
                 [newPrice, cardName],
                 (err, results) => {
                     if (err) {
-                        res.writeHead(500, {"Content-Type" : "application/json"})
-                        res.end(JSON.stringify({deuRuim : true}))
+                        res.writeHead(500, { "Content-Type": "application/json" })
+                        res.end(JSON.stringify({ deuRuim: true }))
                         return;
-                    } 
+                    }
 
-                    res.writeHead(200, {"Content-Type" : "application/json"})
-                    res.end(JSON.stringify({results, deuRuim: false}))
+                    res.writeHead(200, { "Content-Type": "application/json" })
+                    res.end(JSON.stringify({ results, deuRuim: false }))
                 }
             )
         })
@@ -245,7 +256,7 @@ const server = http.createServer((req, res) => {
 
     }
 
-    if (req.method === "POST" && req.url ==="/fetchAll") {
+    if (req.method === "POST" && req.url === "/fetchAll") {
         let body = ""
 
         req.on("data", c => {
@@ -258,18 +269,18 @@ const server = http.createServer((req, res) => {
                 [],
                 (err, results) => {
                     if (err) {
-                        res.writeHead(500, {"Content-Type" : "application/json"})
+                        res.writeHead(500, { "Content-Type": "application/json" })
                         res.end(JSON.stringify({
-                            error : err.message,                       
-                            deuRuim : true
+                            error: err.message,
+                            deuRuim: true
                         }))
                         return;
                     }
-    
-                    res.writeHead(200, {"Content-Type" : "application/json"})
+
+                    res.writeHead(200, { "Content-Type": "application/json" })
                     res.end(JSON.stringify({
                         results,
-                        deuRuim : false
+                        deuRuim: false
                     }))
                 }
             )
